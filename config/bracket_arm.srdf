@@ -41,6 +41,8 @@
         <joint name="joint_4" value="1.5708"/>
         <joint name="joint_5" value="0"/>
     </group_state>
+    <!--PASSIVE JOINTS: Joints that are not actively controlled (e.g. mimic joints)-->
+    <passive_joint name="joint_5_mimic"/>
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
     <disable_collisions link1="base_link" link2="forearm_link" reason="Never"/>
     <disable_collisions link1="base_link" link2="turret_link" reason="Adjacent"/>
