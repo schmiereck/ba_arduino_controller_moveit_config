@@ -1,0 +1,10 @@
+# Trajectory execution configuration
+moveit_manage_controllers: true
+
+# Toleranz zwischen geplantem Startpunkt und aktueller Roboterposition.
+# 0 = deaktiviert den Check. Sinnvoll bei Servos ohne Encoder,
+# da die gemeldete Position (Ros2Bridge) von der physischen abweichen kann.
+trajectory_execution:
+  allowed_start_tolerance: 0.0
+  allowed_goal_duration_margin: 0.5
+  allowed_goal_duration_scaling: 1.1

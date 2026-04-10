@@ -26,7 +26,7 @@
         <joint name="joint_3" value="3.14"/>
     </group_state>
     <group_state name="home" group="gripper">
-        <joint name="joint_5" value="0"/>
+        <joint name="joint_5" value="0.76"/>
     </group_state>
     <group_state name="home" group="arm_with_gripper">
         <joint name="joint_0" value="1.5708"/>
@@ -34,7 +34,7 @@
         <joint name="joint_2" value="0"/>
         <joint name="joint_3" value="3.14"/>
         <joint name="joint_4" value="1.5708"/>
-        <joint name="joint_5" value="0"/>
+        <joint name="joint_5" value="0.76"/>
     </group_state>
     <!--PASSIVE JOINTS: Joints that are not actively controlled (e.g. mimic joints)-->
     <passive_joint name="joint_5_mimic"/>
