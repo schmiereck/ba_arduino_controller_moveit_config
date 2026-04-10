@@ -36,6 +36,9 @@ def generate_launch_description():
             "publish_state_updates": True,
             "publish_transforms_updates": True,
             "monitor_dynamics": False,
+            # Periodic publishing rate (Hz) for /monitored_planning_scene.
+            # PlanningSceneMonitor reads this with namespace prefix.
+            "planning_scene_monitor.publish_planning_scene_hz": 4.0,
         },
     ]
 
