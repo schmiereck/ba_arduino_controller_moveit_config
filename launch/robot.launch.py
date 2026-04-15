@@ -11,6 +11,7 @@ from moveit_configs_utils.launches import (
     generate_move_group_launch,
     generate_moveit_rviz_launch,
     generate_rsp_launch,
+    generate_static_virtual_joint_tfs_launch,
 )
 
 
@@ -21,6 +22,10 @@ def generate_launch_description():
     )
 
     ld = LaunchDescription()
+
+    # Static virtual joint transformations (e.g., world -> base_link)
+    for entity in generate_static_virtual_joint_tfs_launch(moveit_config).entities:
+        ld.add_action(entity)
 
     # Robot State Publisher (publishes /robot_description)
     for entity in generate_rsp_launch(moveit_config).entities:
