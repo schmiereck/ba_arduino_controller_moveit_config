@@ -25,12 +25,13 @@ def generate_launch_description():
         .to_moveit_configs()
     )
 
-    # Inject OMPL tolerances directly into the config dictionary
+    # Inject OMPL tolerances directly into the config dictionary to handle clock drift
     if "ompl" in moveit_config.planning_pipelines:
         ompl_config = moveit_config.planning_pipelines["ompl"]
-        if "arm" in ompl_config:
-            ompl_config["arm"]["start_state_max_bounds_error"] = 0.5
-            ompl_config["arm"]["start_state_max_dt"] = 2.0
+        for group in ompl_config.keys():
+            if isinstance(ompl_config[group], dict):
+                ompl_config[group]["start_state_max_bounds_error"] = 0.5
+                ompl_config[group]["start_state_max_dt"] = 2.0
 
     ld = LaunchDescription()
 
@@ -43,12 +44,7 @@ def generate_launch_description():
         ld.add_action(entity)
 
     # MoveGroup (motion planning + trajectory execution)
-    # We pass the extra_params here
     for entity in generate_move_group_launch(moveit_config).entities:
-        # If the entity is a Node, we could technically add parameters, but
-        # generate_move_group_launch already wraps them. 
-        # A simpler way in MoveIt2 is to ensure they are in the YAML or 
-        # passed via the launch description.
         ld.add_action(entity)
 
     # RViz with MotionPlanning plugin
@@ -57,8 +53,6 @@ def generate_launch_description():
 
     # Planning Scene Relay: Periodisch die Scene von move_group abrufen
     # und auf /monitored_planning_scene republizieren.
-    # Workaround: move_group publiziert State-Updates nicht zuverlaessig,
-    # sodass RViz nach einer Trajektorie einen veralteten Start-Zustand hat.
     pkg_prefix = get_package_prefix('ba_arduino_controller_moveit_config')
     relay_script = os.path.join(
         pkg_prefix, 'lib', 'ba_arduino_controller_moveit_config',
