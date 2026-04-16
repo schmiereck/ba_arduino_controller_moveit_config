@@ -44,7 +44,13 @@ def generate_launch_description():
         ld.add_action(entity)
 
     # MoveGroup (motion planning + trajectory execution)
-    for entity in generate_move_group_launch(moveit_config).entities:
+    # Increase state age tolerance for the monitor as well
+    move_group_entities = generate_move_group_launch(moveit_config).entities
+    for entity in move_group_entities:
+        if hasattr(entity, 'parameters'):
+            entity.parameters.append({'current_state_monitor.max_state_age': 5.0})
+    
+    for entity in move_group_entities:
         ld.add_action(entity)
 
     # RViz with MotionPlanning plugin
