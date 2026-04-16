@@ -18,15 +18,19 @@ from moveit_configs_utils.launches import (
 def generate_launch_description():
     moveit_config = (
         MoveItConfigsBuilder("bracket_arm", package_name="ba_arduino_controller_moveit_config")
+        .planning_pipelines(
+            pipelines=["ompl", "pilz_industrial_motion_planner", "chomp"],
+            default_planning_pipeline="ompl"
+        )
         .to_moveit_configs()
     )
 
-    # Extra parameters for MoveGroup to handle time sync/drift
-    extra_params = {
-        "ompl.arm.start_state_max_bounds_error": 0.5,
-        "ompl.arm.start_state_max_dt": 2.0,
-        "jiggle_fraction": 0.1,
-    }
+    # Inject OMPL tolerances directly into the config dictionary
+    if "ompl" in moveit_config.planning_pipelines:
+        ompl_config = moveit_config.planning_pipelines["ompl"]
+        if "arm" in ompl_config:
+            ompl_config["arm"]["start_state_max_bounds_error"] = 0.5
+            ompl_config["arm"]["start_state_max_dt"] = 2.0
 
     ld = LaunchDescription()
 
