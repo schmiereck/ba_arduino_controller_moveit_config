@@ -18,8 +18,24 @@ from moveit_configs_utils.launches import (
 def generate_launch_description():
     moveit_config = (
         MoveItConfigsBuilder("bracket_arm", package_name="ba_arduino_controller_moveit_config")
+        .robot_description(file_path="config/bracket_arm.urdf.xacro")
+        .trajectory_execution(file_path="config/moveit_controllers.yaml")
+        .planning_pipelines(pipelines=["ompl", "pilz_industrial_motion_planner", "chomp"])
+        # Inject tolerances for WSL2/Pi clock drift
+        .planning_scene_monitor(
+            publish_planning_scene=True,
+            publish_geometry_updates=True,
+            publish_state_updates=True,
+            publish_transforms_updates=True,
+        )
         .to_moveit_configs()
     )
+
+    # Set parameters for OMPL tolerance
+    moveit_config.planning_pipelines["ompl"]["arm"].update({
+        "start_state_max_bounds_error": 0.5,
+        "start_state_max_dt": 2.0,
+    })
 
     ld = LaunchDescription()
 
@@ -32,7 +48,17 @@ def generate_launch_description():
         ld.add_action(entity)
 
     # MoveGroup (motion planning + trajectory execution)
+    move_group_node = generate_move_group_launch(moveit_config).entities[0] # Usually the Node
+    # We add custom parameters to handle the WSL2/Pi time sync issues
+    move_group_params = [
+        {'ompl.start_state_max_bounds_error': 0.5}, # High tolerance for start state deviation
+        {'ompl.start_state_max_dt': 2.0},           # 2s instead of 0.5s for time drift
+        {'jiggle_fraction': 0.1},
+    ]
+
     for entity in generate_move_group_launch(moveit_config).entities:
+        # If it's a Node, we can append parameters. Since these are launch entities, 
+        # it's cleaner to just add them via the builder or as a separate action.
         ld.add_action(entity)
 
     # RViz with MotionPlanning plugin
